@@ -8,6 +8,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.util.math.Vec3d;
 import org.joml.primitives.AABBdc;
+import org.joml.primitives.AABBic;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -27,8 +28,14 @@ public class Util {
             Vec3d prevPos = producer.getPrevPos();
 
             AABBdc aabb = ship.getWorldAABB();
+            AABBic saabb = ship.getShipAABB();
             if (prevPos != null) {
-                var7 = WakeNode.Factory.thickNodeTrail(prevPos.x, prevPos.z, (aabb.maxX() + aabb.minX())/2, (aabb.maxZ() + aabb.minZ())/2, height, (float)WakesClient.CONFIG_INSTANCE.initialStrength, velocity, 3f).iterator();
+                assert saabb != null;
+                float xwidth = saabb.maxX() - saabb.minX();
+                float zwidth = saabb.maxZ() - saabb.minZ();
+                float width = Math.min(xwidth, zwidth);
+
+                var7 = WakeNode.Factory.thickNodeTrail(prevPos.x, prevPos.z, (aabb.maxX() + aabb.minX())/2, (aabb.maxZ() + aabb.minZ())/2, height, (float)WakesClient.CONFIG_INSTANCE.initialStrength, velocity, width).iterator();
 
                 while(var7.hasNext()) {
                     node = (WakeNode)var7.next();
