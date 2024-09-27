@@ -1,5 +1,6 @@
 package g_mungus.wakes_compat;
 
+import com.goby56.wakes.duck.ProducesWake;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.ModInitializer;
 
@@ -8,6 +9,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.world.World;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.valkyrienskies.core.impl.game.ships.ShipObjectClient;
 import org.valkyrienskies.mod.common.VSClientGameUtils;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 
@@ -36,6 +38,7 @@ public class VSWakesCompat implements ClientModInitializer {
 		VSGameUtilsKt.getAllShips(world).forEach(s -> {
 			if (s != null) {
 				Util.placeWakeTrail(s);
+				((ProducesWake)s).setPrevPos(Util.getCentre(s.getWorldAABB()));
 			}
 		});
 	}

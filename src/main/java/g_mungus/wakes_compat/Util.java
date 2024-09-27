@@ -28,7 +28,7 @@ public class Util {
 
             AABBdc aabb = ship.getWorldAABB();
             if (prevPos != null) {
-                var7 = WakeNode.Factory.thickNodeTrail(prevPos.x, prevPos.z, (aabb.maxX() + aabb.minX())/2, (aabb.maxX() + aabb.minX())/2, height, (float)WakesClient.CONFIG_INSTANCE.initialStrength, velocity, 3f).iterator();
+                var7 = WakeNode.Factory.thickNodeTrail(prevPos.x, prevPos.z, (aabb.maxX() + aabb.minX())/2, (aabb.maxZ() + aabb.minZ())/2, height, (float)WakesClient.CONFIG_INSTANCE.initialStrength, velocity, 3f).iterator();
 
                 while(var7.hasNext()) {
                     node = (WakeNode)var7.next();

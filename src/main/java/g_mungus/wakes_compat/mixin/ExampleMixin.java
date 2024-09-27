@@ -3,6 +3,7 @@ package g_mungus.wakes_compat.mixin;
 import com.goby56.wakes.duck.ProducesWake;
 import com.goby56.wakes.particle.custom.SplashPlaneParticle;
 import g_mungus.wakes_compat.Util;
+import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
@@ -20,6 +21,8 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 @Mixin(ShipObjectClient.class)
 public abstract class ExampleMixin implements ProducesWake {
 
+	private Vec3d prevPosOnSurface;
+
 	@Shadow public abstract Vector3dc getVelocity();
 
 	@Override
@@ -34,7 +37,7 @@ public abstract class ExampleMixin implements ProducesWake {
 
 	@Override
 	public Vec3d getPrevPos() {
-		return getPos().add((this.getNumericalVelocity().multiply(-0.01)));
+		return this.prevPosOnSurface == null ? null : new Vec3d(this.prevPosOnSurface.x, this.prevPosOnSurface.y, this.prevPosOnSurface.z);
 	}
 
 	@Unique
@@ -43,9 +46,10 @@ public abstract class ExampleMixin implements ProducesWake {
 	}
 
 	@Override
-	public void setPrevPos(Vec3d vec3d) {
-
+	public void setPrevPos(Vec3d pos) {
+		this.prevPosOnSurface = pos;
 	}
+
 
 	@Override
 	public Vec3d getNumericalVelocity() {
