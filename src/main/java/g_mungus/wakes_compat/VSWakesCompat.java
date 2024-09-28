@@ -1,33 +1,25 @@
 package g_mungus.wakes_compat;
 
 import com.goby56.wakes.duck.ProducesWake;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.joml.Quaterniondc;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
-import org.joml.primitives.AABBdc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.valkyrienskies.core.api.ships.Ship;
-import org.valkyrienskies.core.impl.game.ships.ShipObjectClient;
-import org.valkyrienskies.eureka.EurekaMod;
-import org.valkyrienskies.eureka.fabric.services.EurekaPlatformHelperFabric;
-import org.valkyrienskies.eureka.services.EurekaPlatformHelper;
-import org.valkyrienskies.eureka.ship.EurekaShipControl;
 import org.valkyrienskies.mod.common.VSClientGameUtils;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
+import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
+
+import static g_mungus.wakes_compat.Util.approximateDirection;
+import static g_mungus.wakes_compat.Util.getYaw;
 
 public class VSWakesCompat implements ClientModInitializer {
 	public static final String MOD_ID = "vs-wakes-compat";
@@ -79,7 +71,6 @@ public class VSWakesCompat implements ClientModInitializer {
 	}
 
 	private int checkShipSize(Ship s) {
-		Direction direction;
 
 		Vector3dc horizontalVelocity = new Vector3d(s.getVelocity().x(), 0, s.getVelocity().z());
 
@@ -92,45 +83,24 @@ public class VSWakesCompat implements ClientModInitializer {
 		double shipAngle = getYaw(s.getTransform().getShipToWorldRotation());
 
 
-        try {
-            direction = approximateDirection(Math.toDegrees(velAngle - shipAngle));
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+
+		Direction direction = approximateDirection(Math.toDegrees(velAngle - shipAngle));
+
+		Vec3d shipPos = Util.getCentre(s.getWorldAABB());
+
+		Double yLevelShip = VectorConversionsMCKt.toJOML(new Vec3d(shipPos.x, 62.9, shipPos.z)).mulPosition(s.getWorldToShip()).y;
+
+		int blockYLevelShip = yLevelShip.intValue();
+
+
 
 
         assert MinecraftClient.getInstance().player != null;
-        MinecraftClient.getInstance().player.sendMessage(Text.of(String.valueOf(direction)));
+        MinecraftClient.getInstance().player.sendMessage(Text.of(String.valueOf(blockYLevelShip)));
 
 		return 0;
 	}
 
-	public static double getYaw(Quaterniondc quaternion) {
-		// Extract the components of the quaternion
-		double w = quaternion.w();
-		double x = quaternion.x();
-		double y = quaternion.y();
-		double z = quaternion.z();
 
-		// Calculate yaw using atan2
-		return -Math.atan2(2.0 * (w * y + x * z), 1.0 - 2.0 * (y * y + z * z));
-	}
-
-	public static Direction approximateDirection (Double degrees) throws Exception {
-		double y = degrees + 45d + 720d;
-		double reduced = y % 360d;
-
-		if (reduced >= 0 && reduced < 90) {
-			return Direction.NORTH;
-		} else if (reduced >= 90 && reduced < 180) {
-			return Direction.EAST;
-		} else if (reduced >= 180 && reduced < 270) {
-			return Direction.SOUTH;
-		} else if (reduced >= 270 && reduced < 360) {
-			return Direction.WEST;
-		} else {
-			throw new Exception("Bruh");
-		}
-	}
 
 }
