@@ -18,36 +18,6 @@ import java.util.Iterator;
 
 public class Util {
 
-    public static void placeWakeTrail(Ship ship) {
-        WakeHandler wakeHandler = WakeHandler.getInstance();
-        if (wakeHandler != null) {
-            ProducesWake producer = (ProducesWake)ship;
-            double velocity = producer.getHorizontalVelocity();
-            float height = producer.producingHeight();
-            Iterator var7;
-            WakeNode node;
-
-            Vec3d prevPos = producer.getPrevPos();
-
-            AABBdc aabb = ship.getWorldAABB();
-            AABBic saabb = ship.getShipAABB();
-            if (prevPos != null) {
-                assert saabb != null;
-                float xwidth = saabb.maxX() - saabb.minX();
-                float zwidth = saabb.maxZ() - saabb.minZ();
-                float width = Math.min(xwidth, zwidth);
-
-                var7 = WakeNode.Factory.thickNodeTrail(prevPos.x, prevPos.z, (aabb.maxX() + aabb.minX())/2, (aabb.maxZ() + aabb.minZ())/2, height, (float)WakesClient.CONFIG_INSTANCE.initialStrength, velocity, width).iterator();
-
-                while(var7.hasNext()) {
-                    node = (WakeNode)var7.next();
-                    wakeHandler.insert(node);
-                }
-
-            }
-        }
-    }
-
     public static Vec3d getCentre (AABBdc aabb) {
         double centreX = (aabb.maxX() + aabb.minX())/2;
         double centreZ = (aabb.maxZ() + aabb.minZ())/2;
@@ -56,13 +26,11 @@ public class Util {
 
 
     public static double getYaw(Quaterniondc quaternion) {
-        // Extract the components of the quaternion
         double w = quaternion.w();
         double x = quaternion.x();
         double y = quaternion.y();
         double z = quaternion.z();
 
-        // Calculate yaw using atan2
         return -Math.atan2(2.0 * (w * y + x * z), 1.0 - 2.0 * (y * y + z * z));
     }
 

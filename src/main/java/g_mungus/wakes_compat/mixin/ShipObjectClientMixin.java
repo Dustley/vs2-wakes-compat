@@ -2,26 +2,29 @@ package g_mungus.wakes_compat.mixin;
 
 import com.goby56.wakes.duck.ProducesWake;
 import com.goby56.wakes.particle.custom.SplashPlaneParticle;
+import g_mungus.wakes_compat.DynamicWakeSize;
 import g_mungus.wakes_compat.Util;
-import net.fabricmc.loader.impl.lib.sat4j.core.Vec;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Vector3d;
 import org.joml.Vector3dc;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.impl.game.ships.ShipObjectClient;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
 @Mixin(ShipObjectClient.class)
-public abstract class ExampleMixin implements ProducesWake {
+public abstract class ShipObjectClientMixin implements ProducesWake, DynamicWakeSize {
 
+	@Unique
 	private Vec3d prevPosOnSurface;
+
+	@Unique
+	private float wakeWidth = 0;
+
+	@Unique
+	private Vec3d offset = Vec3d.ZERO;
 
 	@Shadow public abstract Vector3dc getVelocity();
 
@@ -40,12 +43,30 @@ public abstract class ExampleMixin implements ProducesWake {
 		return this.prevPosOnSurface == null ? null : new Vec3d(this.prevPosOnSurface.x, this.prevPosOnSurface.y, this.prevPosOnSurface.z);
 	}
 
-	@Unique
-	public Vec3d getPos() {
-		return Util.getCentre(((Ship)(Object)this).getWorldAABB());
+	@Override
+	public float vs_wakes_compat_template_1_20_1$getWidth() {
+		return this.wakeWidth;
 	}
 
 	@Override
+	public void vs_wakes_compat_template_1_20_1$setWidth(float width) {
+		this.wakeWidth = width;
+	}
+
+	@Override
+	public Vec3d vs_wakes_compat_template_1_20_1$getPos() {
+		Ship ship = (Ship)(Object)this;
+		return Util.getCentre(ship.getWorldAABB()).add(offset.rotateY((float) Util.getYaw(ship.getTransform().getShipToWorldRotation())));
+	}
+
+	@Override
+    public void vs_wakes_compat_template_1_20_1$setOffset(Vec3d vec3d) {
+		this.offset = vec3d;
+    }
+
+
+
+    @Override
 	public void setPrevPos(Vec3d pos) {
 		this.prevPosOnSurface = pos;
 	}

@@ -3,7 +3,7 @@
 	"package": "g_mungus.wakes_compat.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"ShipObjectClientMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
