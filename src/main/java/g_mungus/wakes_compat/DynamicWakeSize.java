@@ -1,6 +1,7 @@
 package g_mungus.wakes_compat;
 
 import net.minecraft.util.math.Vec3d;
+import org.joml.Vector3d;
 
 public interface DynamicWakeSize {
 
@@ -10,5 +11,5 @@ public interface DynamicWakeSize {
 
     public Vec3d vs_wakes_compat_template_1_20_1$getPos();
 
-    public void vs_wakes_compat_template_1_20_1$setOffset(Vec3d pos);
+    public void vs_wakes_compat_template_1_20_1$setOffset(Vector3d pos);
 }

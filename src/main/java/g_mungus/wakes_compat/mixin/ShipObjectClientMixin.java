@@ -5,8 +5,7 @@ import com.goby56.wakes.particle.custom.SplashPlaneParticle;
 import g_mungus.wakes_compat.DynamicWakeSize;
 import g_mungus.wakes_compat.Util;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Vector3d;
-import org.joml.Vector3dc;
+import org.joml.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -14,7 +13,7 @@ import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.impl.game.ships.ShipObjectClient;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
-@Mixin(ShipObjectClient.class)
+@Mixin(value = ShipObjectClient.class, remap = false)
 public abstract class ShipObjectClientMixin implements ProducesWake, DynamicWakeSize {
 
 	@Unique
@@ -55,13 +54,19 @@ public abstract class ShipObjectClientMixin implements ProducesWake, DynamicWake
 
 	@Override
 	public Vec3d vs_wakes_compat_template_1_20_1$getPos() {
-		Ship ship = (Ship)(Object)this;
-		return Util.getCentre(ship.getWorldAABB()).add(offset.rotateY((float) Util.getYaw(ship.getTransform().getShipToWorldRotation())));
+
+		return Util.getCentre(((Ship)(Object)this).getWorldAABB()).add(offset);
 	}
 
 	@Override
-    public void vs_wakes_compat_template_1_20_1$setOffset(Vec3d vec3d) {
-		this.offset = vec3d;
+    public void vs_wakes_compat_template_1_20_1$setOffset(Vector3d vec) {
+
+
+		Ship ship = (Ship)(Object)this;
+		Quaterniondc mat = ship.getTransform().getShipToWorldRotation();
+
+
+		this.offset = VectorConversionsMCKt.toMinecraft(vec.rotate(mat));
     }
 
 
