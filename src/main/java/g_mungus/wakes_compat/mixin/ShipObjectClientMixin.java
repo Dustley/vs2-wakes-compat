@@ -4,6 +4,7 @@ import com.goby56.wakes.duck.ProducesWake;
 import com.goby56.wakes.particle.custom.SplashPlaneParticle;
 import g_mungus.wakes_compat.DynamicWakeSize;
 import g_mungus.wakes_compat.Util;
+import g_mungus.wakes_compat.VSWakesCompat;
 import net.minecraft.util.math.Vec3d;
 import org.joml.*;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +35,7 @@ public abstract class ShipObjectClientMixin implements ProducesWake, DynamicWake
 
 	@Override
 	public float producingHeight() {
-		return 62.9f;
+		return (float) VSWakesCompat.getSeaLevel();
 	}
 
 	@Override

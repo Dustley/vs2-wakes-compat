@@ -3,7 +3,10 @@ package g_mungus.wakes_compat;
 import com.goby56.wakes.duck.ProducesWake;
 import net.fabricmc.api.ClientModInitializer;
 
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.Direction;
@@ -32,16 +35,25 @@ public class VSWakesCompat implements ClientModInitializer {
 
 	private int shipSizeUpdaterCooldown = 0;
 
+	private static double seaLevel = 62.9;
+
 	@Override
 	public void onInitializeClient() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
 		ClientTickEvents.END_CLIENT_TICK.register(client -> onClientTick());
+		ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> onClientJoin(client));
 
 		LOGGER.info("Hello Fabric world!");
 	}
 
+	private void onClientJoin(MinecraftClient client) {
+		if (seaLevel != 63) {
+			assert client.world != null;
+			seaLevel = client.world.getSeaLevel() - 0.1;
+		}
+	}
 
 
 	private void onClientTick() {
@@ -72,10 +84,7 @@ public class VSWakesCompat implements ClientModInitializer {
 	}
 
 
-
-
-
-
-
-
+	public static double getSeaLevel() {
+		return seaLevel;
+	}
 }

@@ -20,6 +20,7 @@ import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 import java.util.*;
 
 import static g_mungus.wakes_compat.Util.*;
+import static g_mungus.wakes_compat.VSWakesCompat.getSeaLevel;
 
 public class ShipWake {
 
@@ -80,7 +81,7 @@ public class ShipWake {
 
         Vec3d shipPos = Util.getCentre(s.getWorldAABB());
 
-        Double yLevelShip = VectorConversionsMCKt.toJOML(new Vec3d(shipPos.x, 62.9, shipPos.z)).mulPosition(s.getWorldToShip()).y;
+        Double yLevelShip = VectorConversionsMCKt.toJOML(new Vec3d(shipPos.x, getSeaLevel(), shipPos.z)).mulPosition(s.getWorldToShip()).y;
 
         int blockYLevelShip = yLevelShip.intValue();
 
