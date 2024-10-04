@@ -17,11 +17,16 @@ import org.joml.Vector3dc;
 import org.joml.Vector3i;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.valkyrienskies.core.api.ships.QueryableShipData;
 import org.valkyrienskies.core.api.ships.Ship;
 import org.valkyrienskies.core.api.world.LevelYRange;
 import org.valkyrienskies.mod.common.VSGameUtilsKt;
 import org.valkyrienskies.mod.common.util.VectorConversionsMCKt;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static g_mungus.wakes_compat.ShipWake.checkShipSize;
 import static g_mungus.wakes_compat.Util.approximateDirection;
 import static g_mungus.wakes_compat.Util.getYaw;
 
@@ -33,6 +38,7 @@ public class VSWakesCompat implements ClientModInitializer {
 	// That way, it's clear which mod wrote info, warnings, and errors.
 	public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+	private static final int SHIPS_PER_CYCLE = 60;
 	private int shipSizeUpdaterCooldown = 0;
 
 	private static double seaLevel = 62.9;
@@ -61,25 +67,34 @@ public class VSWakesCompat implements ClientModInitializer {
 
         World world = MinecraftClient.getInstance().player.getWorld();
 
-		VSGameUtilsKt.getAllShips(world).forEach(s -> {
-			if (s != null) {
+		// Update wake scale
+		List<Ship> ships = VSGameUtilsKt.getAllShips(world).stream().toList();
 
-				if (shipSizeUpdaterCooldown == 0) {
-					ShipWake.checkShipSize(s);
-				}
+		if(!ships.isEmpty()) {
 
+			// Determine the number of ships to process per cycle
+			int shipsThisCycle = (int) Math.ceil((double) ships.size() / SHIPS_PER_CYCLE);
+			int startIndex = shipSizeUpdaterCooldown * shipsThisCycle;
+			int endIndex = Math.min(startIndex + shipsThisCycle, ships.size());
 
-				ShipWake.placeWakeTrail(s);
-				((ProducesWake)s).setPrevPos(((DynamicWakeSize)s).vs_wakes_compat_template_1_20_1$getPos());
+			LOGGER.info("Start at: {} End at: {} Ships: {} Tick: {}", startIndex, endIndex, ships.size(), shipSizeUpdaterCooldown);
+
+			for (int i = startIndex; i < endIndex - 1; i++) {
+				Ship s = ships.get(i);
+				if (s != null) checkShipSize(s);
 			}
 
+			// Place wake
+			for (Ship s : VSGameUtilsKt.getAllShips(world)) {
+				ShipWake.placeWakeTrail(s);
+				((ProducesWake) s).setPrevPos(((DynamicWakeSize) s).vs_wakes_compat_template_1_20_1$getPos());
+			}
 
-		});
-
-		if (shipSizeUpdaterCooldown == 9) {
-			shipSizeUpdaterCooldown = 0;
-		} else {
-			shipSizeUpdaterCooldown++;
+			if (shipSizeUpdaterCooldown == SHIPS_PER_CYCLE - 1) {
+				shipSizeUpdaterCooldown = 0;
+			} else {
+				shipSizeUpdaterCooldown++;
+			}
 		}
 	}
 

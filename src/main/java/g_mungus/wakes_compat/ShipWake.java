@@ -66,15 +66,10 @@ public class ShipWake {
         World world = MinecraftClient.getInstance().world;
 
         Vector3dc horizontalVelocity = new Vector3d(s.getVelocity().x(), 0, s.getVelocity().z());
-
         if (horizontalVelocity.length() < 0.05) return;
 
-
         double velAngle = horizontalVelocity.angleSigned(new Vector3d(0, 0, -1), new Vector3d(0, 1, 0));
-
-
         double shipAngle = getYaw(s.getTransform().getShipToWorldRotation());
-
 
 
         Direction direction = approximateDirection(Math.toDegrees(velAngle - shipAngle));
